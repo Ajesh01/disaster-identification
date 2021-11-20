@@ -1,6 +1,9 @@
 from flask import Flask, render_template
+import requests
 
 app = Flask(__name__)
+
+
 
 
 
@@ -9,6 +12,12 @@ app = Flask(__name__)
 @app.route('/', methods = ["GET"]) 
 def index():
 
+    URL = "http://172.20.0.2:5555/test"
+    PARAMS = {'address':'hey'}
+    r = requests.get(url = URL)
+    data = r.json()
+    return str(data)
+    # print(r.data)
     return render_template("index.html")
 
 if __name__ == '__main__':
