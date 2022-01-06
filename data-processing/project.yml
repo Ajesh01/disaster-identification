@@ -9,8 +9,8 @@ vars:
   # Set your GPU ID, -1 is CPU
   gpu_id: -1
   version: "0.0.0"
-  train: "docs_issues_training.jsonl"
-  dev: "docs_issues_eval.jsonl"
+  train: "disaster_tweets_training.jsonl"
+  dev: "disaster_tweets_eval.jsonl"
   config: "config.cfg"
 
 # These are the directories that the project needs. The project CLI will make

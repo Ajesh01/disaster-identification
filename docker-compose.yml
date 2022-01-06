@@ -9,6 +9,14 @@ services:
     ports:
       - 5555:5555
     hostname: backend-service
+  
+  data-processing:
+    build: ./data-processing
+    volumes:
+      - ./data-processing:/code
+    ports:
+      - 6666:6666
+    hostname: data-processing-service
 
   web-ui:
     build: ./web-ui
