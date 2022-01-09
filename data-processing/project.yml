@@ -11,7 +11,7 @@ vars:
   version: "0.0.0"
   train: "disaster_tweets_training.jsonl"
   dev: "disaster_tweets_eval.jsonl"
-  config: "config.cfg"
+  config: "config.conf"
 
 # These are the directories that the project needs. The project CLI will make
 # sure that they always exist.

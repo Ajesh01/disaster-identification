@@ -5,10 +5,12 @@ import json
 
 
 import spacy
+from spacy import displacy
 from spacy.language import Language
+from spacy.util import get_model_lower_version
 from spacy_langdetect import LanguageDetector
 
-
+import en_textcat_demo
 
 
 
@@ -22,7 +24,8 @@ def get_lang_detector(nlp, name):
     return LanguageDetector()
 
 
-nlp = spacy.load("en_core_web_sm")
+global nlp 
+nlp  = spacy.load("en_core_web_sm")
 Language.factory("language_detector", func=get_lang_detector)
 nlp.add_pipe('language_detector', last=True)
 
@@ -41,9 +44,9 @@ def test():
 
 @app.route('/latest-tweets', methods = ["GET"]) 
 def get_latest_tweets():
-
+    global nlp
     # gets tweets and saves it in a jsonl format
-    os.system("snscrape --jsonl --max-results 50 --since 2020-06-01 twitter-search 'flood' > text-query-tweets.json")
+    os.system("snscrape --jsonl --max-results 500 --since 2020-06-01 twitter-search 'killed OR dead OR disaster OR tragedy OR incident' > text-query-tweets.json")
     # print(count(tweets_list2)) 
  
     tweets = []
@@ -58,32 +61,48 @@ def get_latest_tweets():
 
         #  filters tweets in english
         if detect_language["language"] == 'en' and detect_language['score'] >= 0.85:
-            english_flag = True
-            tweet["is_english"] = english_flag
-            tweets.append(tweet)
+            # english_flag = True
+            # tweet["is_english"] = english_flag
+            # print(tweet)
+
+            
+            tweets.append(tweet["content"])
+
+    
+    nlp2 = en_textcat_demo.load()
+
+    docs = list(nlp2.pipe(tweets))
+
+    result = []
+    locations_list = []
+
+    for doc in docs:
+        # print(doc.text)
+        # print()
+        # print(ty)
+        if doc.cats["DISASTER"] > 0.75:
+            # result.append(doc.text)
+            text2= nlp(doc.text)
+            for word in text2.ents:
+                # print(word.text,word.label_)
+                # print(word.label_)
+
+                if word.label_ == "GPE" and word.text not in locations_list:
+                    locations_list.append(word.text)
+                    print(doc.text)
+    # displacy.render(doc, style="ent")
+            # print(f"{doc.text}\n")
+    # print(detect_language)
+    # print({ "result" : result })
+    
+
+    
+
+    return { "result" : locations_list }
 
 
-        
-    # pprint.pprint(tweets[0])
 
 
-
-
-    print(detect_language)
-
-    return { "result" : "success" }
-
-
-import en_textcat_demo
-
-nlp = en_textcat_demo.load()
-text = ['yea right, so funny', 'You forgot "Am I a joke to you" guy', "Pretty ballsey for Ted to mouth off to his bosses like that.", "I’m sure she is going to make an absolutely stellar cop, with no power trip agenda whatsoever", "Shut up, college boy!!"]
-
-docs = list(nlp.pipe(text))
-result = []
-for doc in docs:
-    print(doc.text)
-    print(f"{doc.cats}\n")
 
 
 if __name__ == '__main__':
