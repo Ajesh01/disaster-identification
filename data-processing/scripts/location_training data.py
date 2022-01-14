@@ -1,4 +1,5 @@
 import csv
+import json
 from os import lchflags
 import random
 import pandas as pd
@@ -31,27 +32,37 @@ df = pd.read_csv('../assets/tweets.csv')
 
 # if df.iloc[5, 6]:
 # {"text": "text", "cats": {"DISASTER": 0.0, "OTHER": 1.0}}
+# ("Pizza is a common fast food.", {"entities": [(0, 5, "FOOD")]})
 
-training_template =  {"text": None , "cats": {"LOCATION": None, "OTHER": 0}}
 
-for i2 in locations:
+with open("../assets/location_training.jsonl", 'a') as outfile:
+
+        for i2 in locations:
+                training_template  =  [ None, {"entities": []}]
+
+                tweet = df.iloc[i , -2]
+                split_tweet = tweet.split()
+                split_tweet.insert(random.randrange(0,len(split_tweet), 2), i2) 
+                new_tweet = ""
+                for word in split_tweet:
+                        new_tweet = new_tweet+" "+word
+                # print(split_tweet, i2)
+                # print(new_tweet)
+                modified_tweets.append(new_tweet)
+
+                print(new_tweet.index(i2))
+                print(new_tweet[new_tweet.index(i2):new_tweet.index(i2)+len(i2)])
+                # print(df.iloc[i+1 , -2])
+                # modified_tweets.append(df.iloc[i+1 , -2])
+                training_template[0] = new_tweet
+                training_template[1]["entities"].append([new_tweet.index(i2),new_tweet.index(i2)+len(i2),"LOCATION"])
                 
-        
-        tweet = df.iloc[i , -2]
-        split_tweet = tweet.split()
-        split_tweet.insert(random.randrange(0,len(split_tweet), 2), i2) 
-        new_tweet = ""
-        for word in split_tweet:
-                new_tweet = new_tweet+" "+word
-        # print(split_tweet, i2)
-        # print(new_tweet)
-        modified_tweets.append(new_tweet)
 
-        print(new_tweet.index(i2))
-        print(new_tweet[new_tweet.index(i2):new_tweet.index(i2)+len(i2)])
-        # print(df.iloc[i+1 , -2])
-        modified_tweets.append(df.iloc[i+1 , -2])
-        i += 2
+                json.dump({"data" : training_template}, outfile)
+                outfile.write('\n')
+                
+                i += 2
+
 
 
 # for tweet in modified_tweets:

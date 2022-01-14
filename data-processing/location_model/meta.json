@@ -1,0 +1,51 @@
+{
+  "lang":"en",
+  "name":"pipeline",
+  "version":"0.0.0",
+  "spacy_version":">=3.1.3,<3.2.0",
+  "description":"",
+  "author":"",
+  "email":"",
+  "url":"",
+  "license":"",
+  "spacy_git_version":"8bda39f08",
+  "vectors":{
+    "width":0,
+    "vectors":0,
+    "keys":0,
+    "name":null
+  },
+  "labels":{
+    "tok2vec":[
+
+    ],
+    "ner":[
+      "LOC"
+    ]
+  },
+  "pipeline":[
+    "tok2vec",
+    "ner"
+  ],
+  "components":[
+    "tok2vec",
+    "ner"
+  ],
+  "disabled":[
+
+  ],
+  "performance":{
+    "ents_f":0.6666666667,
+    "ents_p":1.0,
+    "ents_r":0.5,
+    "ents_per_type":{
+      "LOC":{
+        "p":1.0,
+        "r":0.5,
+        "f":0.6666666667
+      }
+    },
+    "tok2vec_loss":2.0251611953,
+    "ner_loss":15.953985368
+  }
+}

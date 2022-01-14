@@ -10,7 +10,8 @@ EXPOSE 6666
 
 RUN pip install -r requirements.txt
 
-RUN python3 -m spacy download en_core_web_sm
+# RUN python3 -m spacy download en_core_web_sm
 
+RUN python3 -m spacy download en_core_web_sm
 
 CMD ["python3", "app.py"]

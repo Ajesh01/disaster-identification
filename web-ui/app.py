@@ -13,7 +13,7 @@ app = Flask(__name__)
 @app.route('/', methods = ["GET"]) 
 def index():
 
-    URL = "http://172.20.0.3:6666/latest-tweets"
+    URL = "http://172.20.0.3:5555/get-locations"
     # PARAMS = {'address':'hey'}
     r = requests.get(url = URL)
     data = r.json()
