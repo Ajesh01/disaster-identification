@@ -48,7 +48,7 @@ def test():
 
 
 
-@app.route('/get-locations', methods = ["GET"]) 
+@app.route('/get_locations', methods = ["GET"]) 
 def get_locations():
 
     collection = tweets_db["location_hits"]
@@ -62,4 +62,5 @@ def get_locations():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0",port=5555)
+    # app.run(debug=True, host="0.0.0.0",port=5555)
+    app.run(host='0.0.0.0',port=5555, debug=True)
