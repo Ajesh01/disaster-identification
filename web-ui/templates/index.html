@@ -17,7 +17,19 @@
 
     <style>
      
-
+     #marker {
+background-image: url('https://docs.mapbox.com/mapbox-gl-js/assets/washington-monument.jpg');
+background-size: cover;
+width: 50px;
+height: 50px;
+border-radius: 50%;
+cursor: pointer;
+}
+ 
+.mapboxgl-popup {
+/* width: 600px; */
+height: 600px;
+}
     </style>
   </head>
   <body>
@@ -54,24 +66,31 @@
         <li>
           <a href="#" class="nav-link text-white">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"/></svg>
-            Orders
+            Your Contributions
           </a>
         </li>
         <li>
           <a href="#" class="nav-link text-white">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"/></svg>
-            Products
+            Settings
           </a>
         </li>
-        <li>
+        <!-- <li>
           <a href="#" class="nav-link text-white">
             <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"/></svg>
             Customers
           </a>
-        </li>
+        </li> -->
       </ul>
+      <button type="button" class="btn btn-warning" id="add_button" style="display: block;" onclick="add_marker()">Add Entry</button>
+
+      <button type="button" class="btn btn-success" id="save_button" style="display: none;" data-toggle="modal" target="#exampleModalCenter" >Save Entry</button>
+
+
       <hr>
+
       <div class="dropdown">
+        
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
           <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
           <strong>mdo</strong>
@@ -83,71 +102,103 @@
           <li><hr class="dropdown-divider"></li>
           <li><a class="dropdown-item" href="#">Sign out</a></li>
         </ul>
+
+      </div>
+    </div>
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
       </div>
     </div>
 
-
     <div id='map' class="col-lg" style="background-color: grey;">
-    
+      
       <script src="https://unpkg.com/@mapbox/mapbox-sdk/umd/mapbox-sdk.min.js"></script>
  
-      <script>
-        var marker_locations = myResult = JSON.parse('{{result|tojson}}');
-        var location_data = Array();
-        console.log(marker_locations)
-        mapboxgl.accessToken = 'pk.eyJ1IjoiYWplc2htYXJ0aW4wMSIsImEiOiJja3lnNHplN28wdnNlMndtbHdmMDM1OHF0In0.qFZ4GUd-Aczp_qwJXUweIQ';
-      const mapboxClient = mapboxSdk({ accessToken: mapboxgl.accessToken });
-      
-      marker_locations["result"].forEach(function (item, index) {
-      // console.log(item.location);
-      mapboxClient.geocoding
-      .forwardGeocode({
-      query: item.location,
-      autocomplete: false,
-      limit: 1
-      })
-      .send()
-      .then((response) => {
-      if (
-      !response ||
-      !response.body ||
-      !response.body.features ||
-      !response.body.features.length
-      ) {
-      console.error('Invalid response:');
-      console.error(response);
-      return;
-      }
-      var feature = response.body.features[0];
-       
-      // console.log(typeof(feature.center));
-      
-      location_data.push(feature.center);
 
-      // Create a marker and add it to the map.
-      // new mapboxgl.Marker().setLngLat(feature.center).addTo(map);
-      });
 
+ <script>
+
+
+var custom_marker_coords = [];
+
+	mapboxgl.accessToken = 'pk.eyJ1IjoiYWplc2htYXJ0aW4wMSIsImEiOiJja3lnNHplN28wdnNlMndtbHdmMDM1OHF0In0.qFZ4GUd-Aczp_qwJXUweIQ';
+const map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/mapbox/streets-v11',
+center: [78.476681027237,
+                22.1991660760527],
+zoom: 4
 });
-      const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11',
-      // center: feature.center,
-      zoom: 0
-      });
-      
-      console.log(typeof(location_data));
+ 
+// Create a default Marker and add it to the map.
 
-    // location_data.forEach(function (item, index) {
-    //   console.log(index);
-    //   // new mapboxgl.Marker().setLngLat(item.center).addTo(map);
-    // });
+var locs = JSON.parse('{{result|tojson}}')["result"]
+// console.log(location)
+for (let i = 0; i < locs.length; i++)
+{ 
+  console.log(typeof(locs[i]["coords"]));
+  console.log(locs[i]);
 
-    for(let i = 0; i < location_data.length; i++)
-    {
-      console.log(location_data[i])
-    }
-      </script>
+  if (locs[i]["coords"].length != 0)
+  {
+    var popup = new mapboxgl.Popup({ offset: 25 }).setText(
+      locs[i]["location"]
+);
+new mapboxgl.Marker({ color: 'red'})
+.setLngLat(locs[i]["coords"])
+.setPopup(popup)
+.addTo(map);
+}}
+// Create a default Marker, colored black, rotated 45 degrees.
+// new mapboxgl.Marker({ color: 'orange', rotation: 45 })
+// .setLngLat([67.6952367278874,
+//                     28.1863846711864])
+// .addTo(map);
+
+function onDragEnd(marker) {
+
+
+
+}
+ 
+
+function add_marker()
+{
+  const marker = new mapboxgl.Marker({
+draggable: true,
+color: 'orange'
+}).setLngLat([78.476681027237,
+                22.1991660760527])
+.addTo(map);
+marker.on('dragend', function(){
+  custom_marker_coords = marker.getLngLat();
+// coordinates.style.display = 'block';
+// coordinates.innerHTML = `Longitude: ${lngLat.lng}<br />Latitude: ${lngLat.lat}`;
+
+document.getElementById("add_button").setAttribute("style", "display:None;");
+// console.log(document.getElementById("add_button")[0]);
+document.getElementById("save_button").setAttribute("style", "display:Block;");
+});
+
+
+}
+</script>
+
 </div>
 
 
@@ -167,5 +218,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
     -->
+
+    
   </body>
 </html>

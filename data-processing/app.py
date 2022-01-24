@@ -18,6 +18,7 @@ import en_textcat_demo
 
 from pathlib import Path
 
+import requests
 
 from flask_apscheduler import APScheduler
 
@@ -57,9 +58,16 @@ def write_locations_db(locations_list):
     collection = tweets_db["location_hits"]
 
     current_datetime = datetime.now()
-
+    
     for location in locations_list:
-        
+        URL = f"https://api.mapbox.com/geocoding/v5/mapbox.places/{location}.json?access_token=pk.eyJ1IjoiYWplc2htYXJ0aW4wMSIsImEiOiJja3lnNHplN28wdnNlMndtbHdmMDM1OHF0In0.qFZ4GUd-Aczp_qwJXUweIQ"
+        # PARAMS = {'address':'hey'}
+        r = requests.get(url = URL)
+        data = r.json()
+        try:
+            coords = data["features"][0]['center']
+        except:
+            coords = []
         check_location = collection.find_one({"location": location})
 
         if check_location :
@@ -70,6 +78,7 @@ def write_locations_db(locations_list):
             location_hit_entry = {
                 "location" : location,
                 "count" : 1,
+                "coords" : coords,
                 "last_hit" : current_datetime # need to change current datetime to latest tweet
             }
             collection.insert_one(location_hit_entry)
@@ -96,8 +105,12 @@ def test():
 # @app.route('/latest-tweets', methods = ["GET"]) 
 def get_latest_tweets():
     global nlp
+    date = datetime.now()
+    
+    date = date.strftime("%Y-%m-%d")
     # gets tweets and saves it in a jsonl format
-    os.system("snscrape --jsonl --max-results 1000 --since 2020-06-01 twitter-search 'killed OR dead OR disaster OR tragedy OR incident AND india' > text-query-tweets.json")
+    # os.system("snscrape --jsonl --max-results 1000 --since 2020-06-01 twitter-search 'killed OR dead OR disaster OR tragedy OR incident AND india' > text-query-tweets.json")
+    os.system(f"snscrape --jsonl --max-results 1000 --since {date} twitter-search 'killed OR dead OR disaster OR tragedy OR incident AND india' > text-query-tweets.json")
     # print(count(tweets_list2)) 
  
     tweets = []
@@ -166,7 +179,8 @@ def get_latest_tweets():
     #             print(ent.label)
         # print("Entities", [(ent.text, ent.label_) for ent in doc.ents])
     
-
+   
+    
     return { "result" : write_locations_db(locations_list) }
 
 
@@ -179,6 +193,6 @@ if __name__ == '__main__':
 
     # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
     scheduler.start()
-    # app.apscheduler.add_job(timezone="Asia/Calcutta", func=get_latest_tweets, trigger='cron', id="tweet_scraping",week='*',day_of_week='*', hour = '*', minute = '*' , second = 0)
+    app.apscheduler.add_job(timezone="Asia/Calcutta", func=get_latest_tweets, trigger='cron', id="tweet_scraping",week='*',day_of_week='*', hour = '*', minute = '*' , second = 0)
     print(scheduler.get_job("tweet_scraping"))
     app.run(debug=True, host="0.0.0.0",port=6666)
