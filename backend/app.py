@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, request
 # import os
 # import json
 
@@ -55,10 +55,53 @@ def get_locations():
 
     location_data = list(collection.find())
 
+    # to add new cols in db
+
+    # for location in location_data:
+    #     collection.update_one({"location" : location["location"]}, 
+    #                                 {"$set": {
+    #                                     "disaster_type"   : None ,
+    #                                     "additional-info" : None
+    #                                 }})
+
     for location in location_data:
         del location["_id"]
 
     return { "result" : location_data }
+
+
+@app.route('/new_location', methods = ["POST"]) 
+def new_location():
+
+    collection = tweets_db["location_hits"]
+
+    coord_string = request.form['coordinates']
+
+    coords = [float(x) for x in coord_string[slice(7, -2, 1)].split(",")]
+    data = {
+        "coords"     : coords,
+        "location"   : request.form['location_name'], 
+        "disaster_type"   : request.form['disaster_type'],
+        "additional-info" : request.form['additional-info'],
+    }
+    print(data["coords"])
+
+    check = collection.find_one({"location" : str(data["location"])})
+
+    if check:
+        if collection.find_one({"location" : str(data["location"]), "disaster_type" : str(data["disaster_type"])}):
+            collection.update_one({"location" : str(data["location"]), "disaster_type" : str(data["disaster_type"])}, 
+                                    {"$set": {"coords": data["coords"], "additional-info" : data["additional-info"]}})
+        else:
+            collection.insert_one(data)
+    else:
+        collection.insert_one(data)
+
+    
+
+    return "New disaster entry added!"
+
+    # return { "result" : location_data }
 
 
 if __name__ == '__main__':
