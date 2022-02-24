@@ -209,7 +209,7 @@ for (let i = 0; i < locs.length; i++)
   }
   else
   {
-    disaster_type = locs[i]["disaster_type"]
+    disaster_type = ": "+locs[i]["disaster_type"]
   }
 
   if (locs[i]["additional-info"] == null || locs[i]["additional-info"] == undefined)
@@ -218,15 +218,15 @@ for (let i = 0; i < locs.length; i++)
   }
   else
   {
-    additional_info = locs[i]["additional_info"]
+    additional_info = locs[i]["additional-info"]
   }
 
 
-  var label_text= locs[i]["location"] +": "+disaster_type+",    "+additional_info;
+  var label_text= "<b><h5>"+locs[i]["location"] +disaster_type+"</b></h5><br><h6>"+additional_info+"</h6>";
 
   if (locs[i]["coords"].length != 0)
   {
-    var popup = new mapboxgl.Popup({ offset: 25 }).setText(
+    var popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
       label_text
 );
 new mapboxgl.Marker({ color: 'red'})

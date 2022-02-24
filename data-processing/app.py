@@ -79,7 +79,9 @@ def write_locations_db(locations_list):
                 "location" : location,
                 "count" : 1,
                 "coords" : coords,
-                "last_hit" : current_datetime # need to change current datetime to latest tweet
+                "disaster_type"   : None ,
+                "additional-info" : None,
+                "last_hit" : current_datetime # need to change current datetime to latest tweet,
             }
             collection.insert_one(location_hit_entry)
     return locations_list
