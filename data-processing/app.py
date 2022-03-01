@@ -193,8 +193,8 @@ def get_latest_tweets():
 
 if __name__ == '__main__':
 
-    # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    # scheduler.start()
-    # app.apscheduler.add_job(timezone="Asia/Calcutta", func=get_latest_tweets, trigger='cron', id="tweet_scraping",week='*',day_of_week='*', hour = '*', minute = '*' , second = 0)
-    print(scheduler.get_job("tweet_scraping"))
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        scheduler.start()
+        app.apscheduler.add_job(timezone="Asia/Calcutta", func=get_latest_tweets, trigger='cron', id="tweet_scraping",week='*',day_of_week='*', hour = '*', minute = '*' , second = 0)
+        print(scheduler.get_job("tweet_scraping"))
     app.run(debug=True, host="0.0.0.0",port=6666)
